@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<form action="index.html" method="post">
+			<h1>Cisco ASR9K Loopback Command Generator</h1> 
+				<h3>This tool will allow you to quickly remove the production interface, move the circuit to a testing subinterface, and revert. </h3>
+			<fieldset> 
+				<legend>Circuit Information:</legend> 
+				<label for="group">Xconnect Group:</label> 
+					<input type="text" id="group" name="group"> <br> 
+				<label for="pseudo">Pseudowire:</label> 
+					<input type="text" id="pseudo" name="pseudo"> <br> 
+				<label for="pinter">Production Interface:</label> 
+					<input type="text" id="pinter" name="pinter"> <br> 
+				<label for="sinter">Subinterface:</label> 
+					<input type="text" id="sinter" name="sinter"> <br> 
+				<label for="ticket">Ticket Number:</label> 
+					<input type="text" id="ticket" name="ticket"> <br> 
+				<label for="vlan">Vlan:</label> 
+					<input type="text" id="vlan" name="vlan"> <br>
+				<label for="mtu">MTU:</label> 
+					<input type="text" id="mtu" name="mtu"> <br>
+				<label for="policer">Policer Profile:</label>
+					<input type="text" id="policer" name="policer"> <br>
+						<br>
+				<button id="formLoop" type="submit">Start Loopback</button><span> ***NOTE***Output displayed below Alcatel fields.</span><br>  
+				<button id="submitRevert" type="submit">Revert Config</button><br>
+				<br>
+				<button id="formClear" type="reset"> Clear Fields/Output </button>
+			</fieldset>  
+		
+			<h1>Alcatel 7750 Loopback Command Generator</h1>
+			<h3>This tool will allow you to quickly loop a sap on an Alcatel 7750 when needing to RFC test. </h3>
+				<fieldset>
+					<legend>Circuit Information:</legend>
+					<label for="sap">SAP:</label>
+					<input type="text" id="sap" name="sap">
+					<br>
+					<label for="service">Service ID:</label>
+					<input type="text" id="service" name="service">
+					<br>
+				</fieldset> 
+					<button id="formStart" type="submit">Start the Loopback</button><br>
+					<button id="submitStop" type="submit">Stop the Loopback</button><br>
+					<br>
+					<button id="formClear" type="reset"> Clear Fields/Output </button>
+
+			 
+			</form>
+			
+			<h1>Command output:</h1><br> 
+							<output name="start"> </output> <br>
+							<output name="stop"> </output> <br>
+							<output name="clear"></output><br>
+							<output name="loop"></output> <br> 
+							<output name="revert"></output> <br>
+		
+		<script>
+			document.getElementById('formStart').onclick = start;
+			document.getElementById('submitStop').onclick = stop;
+			document.getElementById('formClear').onclick = clear;
+			document.getElementById("formLoop").onclick = loop;
+			document.getElementById("submitRevert").onclick = revert;
+				function start(event) {
+					event.preventDefault();
+					var sap = document.getElementById('sap').value;
+					var service = document.getElementById('service').value;
+					console.log(sap, service);
+					document.querySelector('output').innerHTML = 'tools perform service id ' + ' ' + service + ' loopback eth sap ' + sap + ' egress mac-swap start';
+				}
+				function stop(event) {
+					event.preventDefault();
+					var sap = document.getElementById('sap').value;
+					var service = document.getElementById('service').value;
+					console.log(sap, service);
+					document.querySelector('output').innerHTML = 'tools perform service id ' + ' ' + service + ' loopback eth sap ' + sap + ' stop';
+				}
+				function clear(event) {
+					document.querySelector('output').innerHTML = ' ';
+				}
+				function loop(event) {
+	                	event.preventDefault();     
+				var pseudo = document.getElementById("pseudo").value;     
+				var group = document.getElementById("group").value;                 
+				var pinter = document.getElementById("pinter").value;     
+				var sinter = document.getElementById("sinter").value;                 
+				var ticket = document.getElementById("ticket").value;     
+				var vlan = document.getElementById("vlan").value;    
+				var mtu = document.getElementById("mtu").value;
+				var policer = document.getElementById("policer").value; 
+					document.querySelector("output").innerHTML = "!config t" + "<br>" +
+					"no l2vpn xconnect group " + group + " p2p " + pseudo + " interface " + pinter + "<br>" +
+					"interface " + sinter + " l2transport" + "<br>" +
+					"interface " + sinter + " l2transport description Test for " + ticket + "<br>" +
+					"interface " + sinter + " l2transport encapsulation dot1q " + vlan + "<br>" +
+					"interface " + sinter + " l2transport rewrite ingress tag pop 1 symmetric" + "<br>" +
+					"interface " + sinter + " l2transport mtu " + mtu + "<br>" +
+					"interface " + sinter + " l2transport service-policy input " + policer + "<br>" +
+					"l2vpn xconnect group " + group + " p2p " + pseudo + " interface " + sinter + "<br>" +
+					"do term mon" + "<br>" + 
+					"!commit comment Test for " + ticket + " Start" + "<br>";           
+			}
+			function revert(event) {
+				event.preventDefault(); 
+				var pseudo = document.getElementById("pseudo").value;     
+				var group = document.getElementById("group").value;                 
+				var pinter = document.getElementById("pinter").value;     
+				var sinter = document.getElementById("sinter").value;                 
+				var ticket = document.getElementById("ticket").value;     
+				var vlan = document.getElementById("vlan").value;    
+				var mtu = document.getElementById("mtu").value;
+				var policer = document.getElementById("policer").value; 
+					document.querySelector("output").innerHTML = "!config t" + "<br>" +
+"no l2vpn xconnect group " + group + " p2p " + pseudo + " interface " + sinter + "<br>" +
+"no interface " + sinter + " l2transport" + "<br>" +
+"l2vpn xconnect group " + group + " p2p " + pseudo + " interface " + pinter + "<br>" +
+"do term mon" + "<br>" + 
+"!commit comment Test for " + ticket + " End" + "<br>"			
+				
+			}
+			function clear(event) {                 
+				document.querySelector("output").innerHTML = " ";             
+			}         
+		</script> 
+	</body>
+</html>
